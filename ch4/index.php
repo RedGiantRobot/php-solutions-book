@@ -1,4 +1,5 @@
 <?php include('./includes/title.inc.php'); ?>
+<?php include('./includes/random_image.php');?>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -17,7 +18,9 @@
   <div id="maincontent">
     <h2>A Journey through Japan with PHP</h2>
     <p>One of the benefits of using PHP is that you can extract common page elements such as the menu and footer, and turn them into server-side includes. Using PHP functions and conditional logic, you can automatically change  the page title and indicate the current page in the menu. Generating a random image on the front page also adds interest to the site.</p>
-    <div id="pictureWrapper"><img src="images/basin.jpg" alt="Water basin at Ryoanji temple" width="350" height="237" class="picBorder"></div>
+    <div id="pictureWrapper">
+        <img src="<?php echo $selectedImage; ?>" alt="Random image"  class="picBorder">
+    </div>
     <p>Ut enim ad minim veniam, quis nostrud exercitation consectetur adipisicing elit. Velit esse cillum dolore ullamco laboris nisi in reprehenderit in voluptate. Mollit anim id est laborum. Sunt in culpa duis aute irure dolor excepteur sint occaecat.</p>
     <p>Eu fugiat nulla pariatur. Ut labore et dolore magna aliqua. Cupidatat non proident, quis nostrud exercitation ut enim ad minim veniam.</p>
     <p>Quis nostrud exercitation eu fugiat nulla pariatur. Ut labore et dolore magna aliqua. Sed do eiusmod tempor incididunt velit esse cillum dolore ullamco laboris nisi.</p>
