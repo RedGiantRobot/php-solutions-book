@@ -1,9 +1,7 @@
 <?php ob_start();
 try {
-    include('./includes/title.inc.php');
-    include('./includes/random_image.php');
-
-    ?>
+  include('./includes/title.inc.php');
+  include('./includes/random_image.php'); ?>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -29,15 +27,12 @@ if (isset($imageSize)) {
   <h1>Japan Journey</h1>
 </div>
 <div id="wrapper">
-  <?php 
-  $file = './includes/menu.inc.php';
-  if(file_exists($file) && is_readable($file)){
-      include($file);
-  }else{
-      throw new Exception("$file can't be found");
-  }
-  $file = include('./includes/menu.inc.php'); 
-  ?>
+<?php
+  $file = 'includes/menu.inc.php';
+  if (file_exists($file) && is_readable($file)) {
+    include($file);
+  } else {
+    throw new Exception("$file can't be found"); } ?>
   <div id="maincontent">
     <h2>A Journey through Japan with PHP</h2>
     <p>One of the benefits of using PHP is that you can extract common page elements such as the menu and footer, and turn them into server-side includes. Using PHP functions and conditional logic, you can automatically change  the page title and indicate the current page in the menu. Generating a random image on the front page also adds interest to the site.</p>
@@ -56,9 +51,8 @@ if (isset($imageSize)) {
 </body>
 </html>
 <?php } catch (Exception $e) {
-     ob_end_clean();
-     header('Location: error.php');
-    }
+  ob_end_clean();
+  header('Location: http://localhost/phpsols2e/error.php');
+}
 ob_end_flush();
 ?>
-
