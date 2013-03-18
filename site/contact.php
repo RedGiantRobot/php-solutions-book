@@ -1,4 +1,32 @@
-<?php include('./includes/title.inc.php'); ?>
+<?php
+include('./includes/title.inc.php'); 
+
+$errors = array();
+$missing = array();
+//check if the form has been submitted
+if (isset($_POST['send'])){
+    //email processing script
+     include('./includes/nuke_magic_quotes.php');
+     
+     $to = 'rob.nale@catmedia.com'; 
+     $subject = 'Feedback From Japan Journey';
+     
+     
+     //Why is the expected array needed?
+     //It keeps hackers from injecting other variables in the $_POST array. Helps ensure security
+     
+     //list expected fields
+     $expected = array('name','email','comments');
+     //set required fields
+     $required = array('name','comments');
+     
+     require('./includes/processmail.inc.php');
+     
+}
+
+
+
+?>
 <!DOCTYPE HTML>
 <html>
 <head>
@@ -32,10 +60,10 @@
             <p>
                 <input name="send" id="send" type="submit" value="Send message">
             </p>
-            <pre>
-            <?php if ($_POST) {print_r($_POST); } ?>
-            </pre>
         </form>
+        <pre>
+        <?php if ($_POST) {print_r($_POST);} ?>
+        </pre>
     </div>
     <?php include('./includes/footer.inc.php'); ?>
 </div>
