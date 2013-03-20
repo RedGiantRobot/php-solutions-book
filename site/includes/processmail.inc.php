@@ -37,3 +37,19 @@ if(!$suspect) {
       }
     }
 }
+
+
+//validate the user's email
+//check for suspicious input, and check to be sure they
+if (!$suspect && !empty($email)) {
+    //In the filter_input
+    //The INPUT_POST parameter is a PHP constant that insures that value was in the $_POST array
+    //The 2nd argument is the name of the element you would like to test
+    //The 3rd argument is another PHP constant that specifies you would like to confirm the input conforms to an email format
+    $validemail = filter_input(INPUT_POST, 'email', FILTER_VALIDATE_EMAIL);
+    if ($validemail) {
+        $headers .= "\r\nReply-To: $validemail";
+    } else {
+        $errors['email'] = true;
+    }
+}

@@ -11,6 +11,9 @@ if (isset($_POST['send'])) {
   $expected = array('name', 'email', 'comments');
   // set required fields
   $required = array('name', 'comments', 'email');
+  // create additional email headers
+  $headers = "From: Japan Jpurney <feedback@example.com> \r\n";
+  $headers .= 'Content-Type: text/plain; charset=utf-8';
   require('./includes/processmail.inc.php');
 }
 ?>
@@ -52,8 +55,11 @@ if (isset($_POST['send'])) {
                 <label for="email">Email:
                 <?php if ($missing && in_array('email', $missing)) { ?>
                   <span class="warning">Please enter your email address</span>
+                <?php } elseif (isset($errors['email'])) { ?>
+                  <span class="warning">Invalid email address</span>
                 <?php } ?>
                 </label>
+                
                 <input name="email" id="email" type="text" class="formbox"
                 <?php if ($missing || $errors) { 
                  echo 'value="' . htmlentities($email, ENT_COMPAT, 'UTF-8') . '"';
