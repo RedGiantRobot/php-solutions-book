@@ -53,3 +53,39 @@ if (!$suspect && !empty($email)) {
         $errors['email'] = true;
     }
 }
+//This variable will be used to redirect the user to a Mail Sent page
+$mailSent = false;
+        
+//go ahead only if not suspect and all required fields OK
+if (!$suspect && !$missing && !$errors) {
+    //initialize the $message variable
+    $message = '';
+    //loop through the $expected array
+    foreach($expected as $item) {
+        //assign the value of the current item to $val
+        if (isset(${$item}) && !empty(${$item})) {
+            $val = ${$item};
+        } else {
+            // if it has no value, assign 'Not selected'
+            $val = 'Not selected';
+        }
+        
+        //if an array, expand as comma-separated string
+        if (is_array($val)) {
+            $val = implode(', ', $val);
+        }
+        
+        //replace underscores and hyphens in the label with spaces
+        $item = str_replace(array('_','-'), ' ', $item);
+        // add label and value to the message body
+        $message .= ucfirst($item).": $val\r\n\r\n";
+    }
+    
+    // limit line length to 70 characters
+    $message = wordwrap($message, 70);
+    
+    $mailSent = mail($to, $subject, $message, $headers);
+    if (!$mailSent) {
+        $errors['mailfail'] = true;
+    }
+}
