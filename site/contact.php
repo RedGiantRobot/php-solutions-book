@@ -209,7 +209,9 @@ if (isset($_POST['send'])) {
 				</select>
 			</p>
 			<p>
-				<label for="select">What characteristics do you associate with Japan?
+                
+                            
+                <label for="select">What characteristics do you associate with Japan?
                 <?php if (isset($errors['characteristics'])) { ?>
                   <span class="warning">Please select at least <?php echo $minList; ?></span>
                 <?php } ?>
