@@ -5,11 +5,14 @@ if (isset($_POST['upload'])) {
     $destination = '/Users/Design1/CATMEDIA/testserver/upload_test/';
     
     
-    require_once('../classes/Ps2/Upload_02.php');
+    require_once('../classes/Ps2/Upload.php');
     try{
         // instantiate the upload class
         $upload = new Ps2_Upload($destination);
+        $upload->setMaxSize($max);
+        //$upload->setPermittedTypes(array('text/plain'));
         $upload->move();
+        
         
         // if any messages are returned, store them in $result
         $result = $upload->getMessages();        

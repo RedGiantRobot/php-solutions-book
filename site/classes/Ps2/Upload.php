@@ -21,17 +21,31 @@ class Ps2_Upload {
         $this->_uploaded = $_FILES;
     }
     
-    public function move() {
+    public function move($overwrite = false) {
         $field = current($this->_uploaded);
         $OK = $this->checkError($field['name'], $field['error']);
         if ($OK) {
             $sizeOK = $this->checkSize($field['name'], $field['size']);
             $typeOK = $this->checkType($field['name'], $field['type']);
             
+            // If the file size is under the maxsize and the file type is a permitted MIME type
             if ($sizeOK && $typeOK) {
-                $success = move_uploaded_file($field['tmp_name'], $this->_destination . $field['name']);
+                // Determine name and whether it will overwrite a previous file, or if it needs to 
+                $name = $this->checkName($field['name'], $overwrite);
+                // Move the uploaded temporary file to it's correct directory
+                $success = move_uploaded_file($field['tmp_name'], $this->_destination . $name);
+                
+                // Did the file upload succsessfully
                 if ($success) {
-                    $this->_messages[] = $field['name'] . ' uploaded successfully';
+                    // Display success to user via message
+                    $message = $field['name'] . ' uploaded successfully';
+                    
+                    //If the file has to be renamed with underscores or by appending numbers
+                    //Let the user be aware of the new filename
+                    if ($this->_renamed) {
+                        $message .= " and renamed $name";
+                    } 
+                    $this->_messages[] = $message;
                 } else {
                     $this->_messages[] = 'Could not upload ' . $field['name'];
                 }
@@ -81,7 +95,9 @@ class Ps2_Upload {
     
     
     protected function checkType($filename, $type) {
-        if (!in_array($type, $this->_permitted)) {
+        if (empty($type)){
+            return false;
+        } elseif (!in_array($type, $this->_permitted)) {
             $this->_messages[] = "$filename is not a permitted type of file.";
             return false;
         } else {
@@ -96,10 +112,81 @@ class Ps2_Upload {
     }
     
     
-    
-    public function addPermitted($types) {
+    // Add new permitted document types by 1 or multiple doc types at once
+    public function addPermittedTypes($types) {
         $types = (array) $types;
         $this->isValidMime($types);
         $this->_permitted = array_merge($this->_permitted, $types);
+    }
+    
+    
+    // Replace the entire list of permitted doc types
+    public function setPermittedTypes($types) {
+        $types = (array) $types;
+        $this->isValidMime($types);
+        $this->_permitted = $types;
+    }
+    
+    
+    
+    protected function isValidMime($types) {
+        // A list of other valid MIME types to be uploaded
+        $alsoValid = array('image/tiff',
+                           'application/pdf', 
+                           'text/plain',
+                           'text/rtf');
+        // Combine the two arrays into one list
+        $valid = array_merge($this->_permitted, $alsoValid);
+        foreach ($types as $type) {
+            if (!in_array($type, $valid)) {
+                throw new Exception("$type is not a permitted MIME type");
+            }
+        }
+    }
+    
+    public function setMaxSize($num) {
+        if (!is_numeric($num)) {
+            throw new Exception("Maximum size must be a number");
+        }
+        $this->_max = (int) $num;
+    }
+    
+    
+    protected function checkName($name, $overwrite) {
+        $nospaces = str_replace(' ', '_', $name);
+        
+        if ($nospaces != $name) {
+            $this->_renamed = true;
+        }
+        if (!$overwrite) {
+            // rename the file if it already exists
+            
+            // returns array of all files or folders
+            $existing = scandir($this->_destination);
+            // Determine if the document name with underscores is already in the directory
+            //if not included, then save it as is with out appending a number to the end
+            //if the underscore name is in the list, add a number
+            if(in_array($nospaces, $existing)) {
+                // Find the position of the . in the documents name, save it as an indexed number
+                // The purpose is to add a number after the base name, but before the '.' and extension
+                $dot = strrpos($nospaces, '.');
+                if ($dot) {
+                    // Search string ($string to search, starting position, last & exclude this character)
+                    $base = substr($nospaces, 0, $dot);
+                    // Find the extension by starting the search including the period and going to the end
+                    $extension = substr($nospaces, $dot);
+                } else {
+                    $base = $nospaces;
+                    $extension = '';
+                }
+                
+                $i = 1;
+                do {
+                    $nospaces = $base . '_' . $i++ . $extension;
+                } while (in_array($nospaces, $existing));
+                $this->_renamed = true;
+            }
+        }
+        return $nospaces;
     }
 }
