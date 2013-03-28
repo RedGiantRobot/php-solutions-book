@@ -1,6 +1,7 @@
 <?php
+namespace Ps2;
 
-class Ps2_Upload {
+class Upload {
     // beginning each variable name with an underscore, depicts it as a protected vairable
     protected $_uploaded = array();
     protected $_destination;
@@ -21,38 +22,68 @@ class Ps2_Upload {
         $this->_uploaded = $_FILES;
     }
     
+    
+    
     public function move($overwrite = false) {
         $field = current($this->_uploaded);
-        $OK = $this->checkError($field['name'], $field['error']);
+        
+        // Check for multiple uploads by determining if it is an array
+        if (is_array($field['name'])) {
+            
+            // Remember that 'name' is the array containing the multiple upload files.
+            // It contains a subarray for each attribute of all uploads. 
+            foreach ($field['name'] as $number => $filename) {
+                // process multiple upload
+                $this->_renamed = false;
+                $this->processFile($field['name'][$number], 
+                                    $field['error'][$number], 
+                                    $field['size'][$number], 
+                                    $field['type'][$number], 
+                                    $field['tmp_name'][$number], 
+                                    $overwrite);
+            }
+        } else {
+            $this->processFile($field['name'], $field['error'], $field['size'], $field['type'], $field['tmp_name'], $overwrite);
+        }
+        
+        
+        
+    }
+    
+    
+    
+    protected function processFile($filename, $error, $size, $type, $tmp_name, $overwrite) {
+        $OK = $this->checkError($filename, $error);
         if ($OK) {
-            $sizeOK = $this->checkSize($field['name'], $field['size']);
-            $typeOK = $this->checkType($field['name'], $field['type']);
+            $sizeOK = $this->checkSize($filename, $size);
+            $typeOK = $this->checkType($filename, $type);
             
             // If the file size is under the maxsize and the file type is a permitted MIME type
             if ($sizeOK && $typeOK) {
                 // Determine name and whether it will overwrite a previous file, or if it needs to 
-                $name = $this->checkName($field['name'], $overwrite);
+                $filename = $this->checkName($filename, $overwrite);
                 // Move the uploaded temporary file to it's correct directory
-                $success = move_uploaded_file($field['tmp_name'], $this->_destination . $name);
+                $success = move_uploaded_file($tmp_name, $this->_destination . $filename);
                 
                 // Did the file upload succsessfully
                 if ($success) {
                     // Display success to user via message
-                    $message = $field['name'] . ' uploaded successfully';
+                    $message = $filename . ' uploaded successfully';
                     
                     //If the file has to be renamed with underscores or by appending numbers
                     //Let the user be aware of the new filename
                     if ($this->_renamed) {
-                        $message .= " and renamed $name";
+                        $message .= " and renamed $filename";
                     } 
                     $this->_messages[] = $message;
                 } else {
-                    $this->_messages[] = 'Could not upload ' . $field['name'];
+                    $this->_messages[] = 'Could not upload ' . $filename;
                 }
             }
         }
     }
-    
+
+
     public function getMessages() {
         return $this->_messages;
     }
@@ -179,8 +210,10 @@ class Ps2_Upload {
                     $base = $nospaces;
                     $extension = '';
                 }
-                
+                // Start the appended number at 1
                 $i = 1;
+                
+                // run the loop while there is a file in the directory that matches the $base . counter . $extension
                 do {
                     $nospaces = $base . '_' . $i++ . $extension;
                 } while (in_array($nospaces, $existing));

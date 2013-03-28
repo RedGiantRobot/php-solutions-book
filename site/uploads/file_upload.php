@@ -8,7 +8,7 @@ if (isset($_POST['upload'])) {
     require_once('../classes/Ps2/Upload.php');
     try{
         // instantiate the upload class
-        $upload = new Ps2_Upload($destination);
+        $upload = new Ps2\Upload($destination);
         $upload->setMaxSize($max);
         //$upload->setPermittedTypes(array('text/plain'));
         $upload->move();
@@ -42,7 +42,7 @@ echo '</ul>';
   <p>
     <label for="image">Upload image:</label>
     <input type="hidden" name="MAX_FILE_SIZE" value="<?php echo $max; ?>"></input>
-    <input type="file" name="image" id="image">
+    <input type="file" name="image[]" id="image" multiple>
   </p>
   <p>
     <input type="submit" name="upload" id="upload" value="Upload">
