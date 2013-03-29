@@ -1,4 +1,6 @@
 <?php
+namespace Ps2;
+
 $max = 51200;
 if (isset($_POST['upload'])) {
     //define the path to the upload folder
@@ -8,7 +10,7 @@ if (isset($_POST['upload'])) {
     require_once('../classes/Ps2/Upload.php');
     try{
         // instantiate the upload class
-        $upload = new Ps2\Upload($destination);
+        $upload = new Upload($destination);
         $upload->setMaxSize($max);
         //$upload->setPermittedTypes(array('text/plain'));
         $upload->move();
